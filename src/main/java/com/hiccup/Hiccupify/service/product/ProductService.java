@@ -1,6 +1,7 @@
 package com.hiccup.Hiccupify.service.product;
 
 import com.hiccup.Hiccupify.exception.ProductNotFoundException;
+import com.hiccup.Hiccupify.exception.ResourceNotFound;
 import com.hiccup.Hiccupify.model.Category;
 import com.hiccup.Hiccupify.model.Product;
 import com.hiccup.Hiccupify.repository.CategoryRepository;
@@ -66,7 +67,7 @@ public class ProductService implements IProductService{
     @Override
     public Product getProductById(Long id) {
         //need the explaination why orElse didnt work but orElseThrow worked.
-        return productRepository.findById(id).orElseThrow(()->new ProductNotFoundException("Product not found"));
+        return productRepository.findById(id).orElseThrow(()->new ResourceNotFound("Product not found"));
     }
 
     //need the explaination
@@ -74,7 +75,7 @@ public class ProductService implements IProductService{
     public void deleteProductById(Long id) {
         productRepository.findById(id)
                 .ifPresentOrElse(productRepository::delete,
-                        ()->new ProductNotFoundException("Product not found!"));
+                        ()->{throw new ResourceNotFound("Product not found!");});
     }
 
     @Override
@@ -85,10 +86,10 @@ public class ProductService implements IProductService{
         return productRepository.findById(id)
                 .map(existingProduct->updateProduct(existingProduct,updateProductRequest))
                 .map(productRepository :: save)
-                .orElseThrow(()->new ProductNotFoundException("Product not found!"));
+                .orElseThrow(()->new ResourceNotFound("Product not found!"));
     }
 
-    private Product updateProduct(Product exisitingProduct, UpdateProductRequest up){
+    public Product updateProduct(Product exisitingProduct, UpdateProductRequest up){
         exisitingProduct.setName(up.getName());
         exisitingProduct.setBrand(up.getBrand());
         exisitingProduct.setDescription(up.getDescription());
