@@ -1,9 +1,8 @@
-package com.hiccup.Hiccupify.controlelr;
+package com.hiccup.Hiccupify.controller;
 
 import com.hiccup.Hiccupify.dto.ImageDto;
 import com.hiccup.Hiccupify.exception.ResourceNotFound;
 import com.hiccup.Hiccupify.model.Image;
-import com.hiccup.Hiccupify.repository.ImageRepository;
 import com.hiccup.Hiccupify.response.ApiResponse;
 import com.hiccup.Hiccupify.service.image.IImageService;
 import lombok.RequiredArgsConstructor;
@@ -11,14 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -27,7 +24,7 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${api.prefix}/image")
+@RequestMapping("${api.prefix}/images")
 public class ImageController {
     private final IImageService imageService;
 
@@ -41,11 +38,18 @@ public class ImageController {
         }
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/image/download/{imageId}")
     public ResponseEntity<Resource> downloadImage(@PathVariable Long imageId) throws SQLException {
+        //here we are retrieving the entity and the image or blob or large object is lazily retrieved so
+        //the exception dont occur here.
         Image image= imageService.getImageById(imageId);
         //converting blob in spring resource so spring can send as binary data in http response
         // pos 1 to start extracting byte from first position so the byte will be complete to get proper image
+        //also while using postgres blob in our case we are getting image length and bytes or any
+        //we need to set transaction to read only because auto commit dont allow to read the large object
+        //in our case is blob
+        //in mysql it works fine no need trasactional as its autocommit can handle the large object
         ByteArrayResource resource=new ByteArrayResource(image.getImage().getBytes(1,(int)image.getImage().length()));
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(image.getFileType()))
                 //this is to tell browser whether download or display the

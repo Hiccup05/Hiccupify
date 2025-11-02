@@ -1,5 +1,6 @@
 package com.hiccup.Hiccupify.service.product;
 
+import com.hiccup.Hiccupify.dto.ProductDto;
 import com.hiccup.Hiccupify.model.Category;
 import com.hiccup.Hiccupify.model.Product;
 import com.hiccup.Hiccupify.request.AddProductRequest;
@@ -20,4 +21,8 @@ public interface IProductService {
     List<Product> getProductByName(String name);
     List<Product> getProductByBrandAndName(String brand, String name);
     Long countProductsByBrandAndName(String brand, String name);
+
+    List<ProductDto> getConvertedProducts(List<Product> product);
+
+    ProductDto convertToDto(Product product);
 }

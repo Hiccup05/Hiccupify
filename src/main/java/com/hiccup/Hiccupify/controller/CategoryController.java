@@ -1,4 +1,4 @@
-package com.hiccup.Hiccupify.controlelr;
+package com.hiccup.Hiccupify.controller;
 
 import com.hiccup.Hiccupify.exception.AlreadyExistException;
 import com.hiccup.Hiccupify.model.Category;

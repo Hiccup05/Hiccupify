@@ -1,15 +1,18 @@
 package com.hiccup.Hiccupify.service.product;
 
-import com.hiccup.Hiccupify.exception.ProductNotFoundException;
+import com.hiccup.Hiccupify.dto.ImageDto;
+import com.hiccup.Hiccupify.dto.ProductDto;
 import com.hiccup.Hiccupify.exception.ResourceNotFound;
 import com.hiccup.Hiccupify.model.Category;
+import com.hiccup.Hiccupify.model.Image;
 import com.hiccup.Hiccupify.model.Product;
 import com.hiccup.Hiccupify.repository.CategoryRepository;
+import com.hiccup.Hiccupify.repository.ImageRepository;
 import com.hiccup.Hiccupify.repository.ProductRepository;
 import com.hiccup.Hiccupify.request.AddProductRequest;
 import com.hiccup.Hiccupify.request.UpdateProductRequest;
-import jdk.jfr.Frequency;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +24,8 @@ public class ProductService implements IProductService{
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageRepository imageRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public Product addProduct(AddProductRequest request) {
@@ -43,10 +48,11 @@ public class ProductService implements IProductService{
         //but while using findbyid which returns optional of category so no need to use wrap ofNullable.
         //using orElseGet is to represent that we are providing solution to null rather that throwing error
         //so on use of orElseThrow
-        Category category=categoryRepository.findById(request.getCategory().getId())
-                        .orElseGet(()->{
-                         return categoryRepository.save(request.getCategory());
-                                });
+        Category category= Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
+                .orElseGet(()->{
+                    Category category1=new Category(request.getCategory().getName());
+                    return categoryRepository.save(category1);}
+                );
 
         request.setCategory(category);
         return productRepository.save(createProduct(request,category));
@@ -112,7 +118,7 @@ public class ProductService implements IProductService{
 
     @Override
     public List<Product> getProuductByCategory(String category) {
-        return productRepository.findByCategory(category);
+        return productRepository.findByCategoryName(category);
     }
 
     @Override
@@ -122,7 +128,7 @@ public class ProductService implements IProductService{
 
     @Override
     public List<Product> getProductByCatagoryAndBrand(String category, String brand) {
-        return productRepository.findByCategoryAndBrand(category,brand);
+        return productRepository.findByCategoryNameAndBrand(category,brand);
     }
 
     @Override
@@ -138,5 +144,27 @@ public class ProductService implements IProductService{
     @Override
     public Long countProductsByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand, name);
+    }
+
+    @Override
+    public List<ProductDto> getConvertedProducts(List<Product> product){
+        return product.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public ProductDto convertToDto(Product product){
+        ProductDto productDto=modelMapper.map(product,ProductDto.class);
+        List<Image> images=imageRepository.findByProductId(product.getId());
+
+        //converts image list into stream and use map method that convert each object to another object
+        //in our case as its a interface method we are applying the logic that we want to convert
+        //image object into image dto and then store in stream as map return stream<R>
+        //in our case R is objects of imagedto
+        List<ImageDto> imageDtos=images.stream().
+                map(image-> modelMapper.map(image, ImageDto.class))
+                .toList();
+
+        productDto.setImage(imageDtos);
+        return productDto;
     }
 }
