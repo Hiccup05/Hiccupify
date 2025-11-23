@@ -2,6 +2,7 @@ package com.hiccup.Hiccupify.service.product;
 
 import com.hiccup.Hiccupify.dto.ImageDto;
 import com.hiccup.Hiccupify.dto.ProductDto;
+import com.hiccup.Hiccupify.exception.AlreadyExistException;
 import com.hiccup.Hiccupify.exception.ResourceNotFound;
 import com.hiccup.Hiccupify.model.Category;
 import com.hiccup.Hiccupify.model.Image;
@@ -48,6 +49,10 @@ public class ProductService implements IProductService{
         //but while using findbyid which returns optional of category so no need to use wrap ofNullable.
         //using orElseGet is to represent that we are providing solution to null rather that throwing error
         //so on use of orElseThrow
+
+        if(productExistis(request.getName(), request.getBrand())){
+            throw new AlreadyExistException(request.getBrand()+" "+request.getName()+" already exists");
+        }
         Category category= Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(()->{
                     Category category1=new Category(request.getCategory().getName());
@@ -56,6 +61,10 @@ public class ProductService implements IProductService{
 
         request.setCategory(category);
         return productRepository.save(createProduct(request,category));
+    }
+
+    private boolean productExistis(String name, String brandName){
+        return productRepository.existsByNameAndBrand(name,brandName);
     }
 
     @Override
