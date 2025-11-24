@@ -3,11 +3,17 @@ package com.hiccup.Hiccupify.controller;
 
 import com.hiccup.Hiccupify.dto.OrdersDto;
 import com.hiccup.Hiccupify.model.Order;
+import com.hiccup.Hiccupify.model.User;
 import com.hiccup.Hiccupify.response.ApiResponse;
+import com.hiccup.Hiccupify.security.user.ShopUserDetails;
 import com.hiccup.Hiccupify.service.order.IOrderService;
+import com.hiccup.Hiccupify.service.user.IUserService;
+import com.hiccup.Hiccupify.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,11 +23,13 @@ import java.util.List;
 @RequestMapping("${api.prefix}/orders")
 public class OrderController {
     private final IOrderService orderService;
+    private final IUserService userService;
 
     @PostMapping("order/create_order")
-    public ResponseEntity<ApiResponse> createOrder(@RequestParam Long userId){
+    public ResponseEntity<ApiResponse> createOrder(){
         try {
-            Order order=orderService.placeOrder(userId);
+            ShopUserDetails principal = (ShopUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Order order=orderService.placeOrder(principal.getId());
             OrdersDto ordersDto = orderService.convertToDto(order);
             return ResponseEntity.ok(new ApiResponse("Item ordered success!", ordersDto));
         } catch (Exception e) {
@@ -29,11 +37,12 @@ public class OrderController {
         }
     }
 
-    @GetMapping("user/get/{userId}")
-    public ResponseEntity<ApiResponse> getUserOrders(@PathVariable Long userId){
+    @GetMapping("user/get")
+    public ResponseEntity<ApiResponse> getUserOrders(){
         try {
-            List<OrdersDto> userOrders = orderService.getUserOrders(userId);
-            return ResponseEntity.ok(new ApiResponse("Item ordered succes!",userOrders));
+            User authenticatedUser = userService.getAuthenticatedUser();
+            List<OrdersDto> userOrders = orderService.getUserOrders(authenticatedUser.getId());
+            return ResponseEntity.ok(new ApiResponse("Item ordered success!",userOrders));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Opps!",e.getMessage()));
         }

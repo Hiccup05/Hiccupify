@@ -3,14 +3,11 @@ package com.hiccup.Hiccupify.controller;
 import com.hiccup.Hiccupify.dto.UserDto;
 import com.hiccup.Hiccupify.exception.ResourceNotFound;
 import com.hiccup.Hiccupify.model.User;
-import com.hiccup.Hiccupify.request.CreateUserRequest;
 import com.hiccup.Hiccupify.request.UserUpdateRequest;
 import com.hiccup.Hiccupify.response.ApiResponse;
 import com.hiccup.Hiccupify.security.user.ShopUserDetails;
 import com.hiccup.Hiccupify.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,9 +24,9 @@ public class UserController {
     @GetMapping("/user")
     public ResponseEntity<ApiResponse> getUserById(){
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            ShopUserDetails principal = (ShopUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok(new ApiResponse("User fetched successfully",principal));
+            User authenticatedUser = userService.getAuthenticatedUser();
+            User user = userService.getUserById(authenticatedUser.getId());
+            return ResponseEntity.ok(new ApiResponse("User fetched successfully",user));
         } catch (ResourceNotFound e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(),null));
         }
