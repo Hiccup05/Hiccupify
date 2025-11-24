@@ -43,8 +43,6 @@ public class ImageService implements IImageService{
                 image.setProduct(product);
                 image.setImage(new SerialBlob(file.getBytes()));
                 String buildDownloadUrl="/api/v1/images/image/download/";
-                //the id of image is null here so we need to set the downloadurl 2 time
-                //to create proper download with proper image id.
                 String downloadUrl=buildDownloadUrl+image.getId();
                 image.setDownloadUrl(downloadUrl);
 

@@ -18,13 +18,11 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class CartService implements ICartService {
-    private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
 
+    private final CartRepository cartRepository;
 
     @Override
     public Cart getCart(Long id) {
-        //need proper logic why total amount and why set again and save
         return cartRepository.findById(id).orElseThrow(()-> new ResourceNotFound("Cart not found"));
     }
 
@@ -37,17 +35,6 @@ public class CartService implements ICartService {
        cart.setCartItems(items);
        cart.updateTotalAmount();
        cartRepository.save(cart);
-
-//        Cart cart=getCart(id);
-//        cartItemRepository.deleteAllByCartId(id);
-//        cart.getCartItems().clear();
-//
-//        // my logic here we are getting optional of cart means T=cart, and trying to pass id but the parameter is asking for T os its throwing error
-////        cartRepository.findById(id).ifPresentOrElse(id->cartRepository::deleteById,()->{throw new ResourceNotFound("cart not found")});\
-//
-//        System.out.println(id);
-//        cartRepository.findById(id).ifPresentOrElse(cart -> cartRepository.deleteById(cart.getId()),()->{throw new ResourceNotFound("cart not found");});
-//        System.out.println("cart deletion sucessfull");
     }
 
     @Override

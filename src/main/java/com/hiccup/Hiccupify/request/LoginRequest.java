@@ -1,6 +1,5 @@
 package com.hiccup.Hiccupify.request;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

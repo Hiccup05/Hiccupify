@@ -15,7 +15,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryService implements ICategoryService{
     private final CategoryRepository categoryRepository;
-    private final ProductRepository productRepository;
 
     @Override
     public Category getCategoryById(Long id) {
@@ -34,7 +33,6 @@ public class CategoryService implements ICategoryService{
 
     @Override
     public Category addCategory(Category category) {
-        //map(categoryRepository(T)::save(R))==map(categoryRepository(T)->T.R);
         return Optional.of(category).filter(c -> !categoryRepository.existsByName(c.getName()))
                 .map(categoryRepository::save).orElseThrow(()-> new AlreadyExistException(category.getName()+"already exists"));
     }

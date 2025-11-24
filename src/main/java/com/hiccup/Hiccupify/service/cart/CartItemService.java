@@ -53,14 +53,10 @@ public class CartItemService implements ICartItemService{
     @Override
     public void updateItemQuantity(Long cartId, Long productId, int quantity) {
         Cart cart=cartRepository.findById(cartId).orElseThrow(()->new ResourceNotFound("Product not found"));
-        //here the carItem is refrencing to the actual cartitem in cart table
-        //the cartItem of cart is in persistent state so the changes in the cartItem will be reflected to actual
-        //item inside cart table
         CartItem cartItem = cart.getCartItems().
                 stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst().orElseThrow(()->new ResourceNotFound("item not found"));
-        //this changes will be directly reflected on cart and cartitem
         cartItem.setQuantity(quantity);
         cartItem.setUnitPrice(cartItem.getProduct().getPrice());
         cartItem.setTotalPrice();

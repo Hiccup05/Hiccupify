@@ -2,11 +2,9 @@ package com.hiccup.Hiccupify.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.util.List;
 
-//using data annotation has its problem...
 @Getter
 @Setter
 @AllArgsConstructor

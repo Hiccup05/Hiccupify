@@ -1,4 +1,5 @@
 package com.hiccup.Hiccupify.security.jwt;
+
 import com.hiccup.Hiccupify.security.user.ShopUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

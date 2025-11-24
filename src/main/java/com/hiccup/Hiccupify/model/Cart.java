@@ -30,7 +30,6 @@ public class Cart {
     @JsonIgnore
     private User user;
 
-    //? why to use this methods if we have databse to add remove and do other things
     public void addItem(CartItem item){
         cartItems.add(item);
         item.setCart(this);

@@ -1,7 +1,6 @@
 package com.hiccup.Hiccupify.service.catagory;
 
 import com.hiccup.Hiccupify.model.Category;
-
 import java.util.List;
 
 public interface ICategoryService {

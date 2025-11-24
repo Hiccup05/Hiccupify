@@ -1,4 +1,5 @@
 package com.hiccup.Hiccupify.service.cart;
+
 import com.hiccup.Hiccupify.model.CartItem;
 
 public interface ICartItemService {

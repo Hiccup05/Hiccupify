@@ -41,15 +41,7 @@ public class ImageController {
     @Transactional(readOnly = true)
     @GetMapping("/image/download/{imageId}")
     public ResponseEntity<Resource> downloadImage(@PathVariable Long imageId) throws SQLException {
-        //here we are retrieving the entity and the image or blob or large object is lazily retrieved so
-        //the exception dont occur here.
         Image image= imageService.getImageById(imageId);
-        //converting blob in spring resource so spring can send as binary data in http response
-        // pos 1 to start extracting byte from first position so the byte will be complete to get proper image
-        //also while using postgres blob in our case we are getting image length and bytes or any
-        //we need to set transaction to read only because auto commit dont allow to read the large object
-        //in our case is blob
-        //in mysql it works fine no need trasactional as its autocommit can handle the large object
         ByteArrayResource resource=new ByteArrayResource(image.getImage().getBytes(1,(int)image.getImage().length()));
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(image.getFileType()))
                 //this is to tell browser whether download or display the
