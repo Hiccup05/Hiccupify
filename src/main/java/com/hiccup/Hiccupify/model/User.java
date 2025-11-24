@@ -1,5 +1,6 @@
 package com.hiccup.Hiccupify.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 

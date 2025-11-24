@@ -1,5 +1,6 @@
 package com.hiccup.Hiccupify.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hiccup.Hiccupify.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,5 +30,6 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name="user_id")
+    @JsonIgnore
     private User user;
 }
